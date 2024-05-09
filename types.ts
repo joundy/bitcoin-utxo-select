@@ -10,6 +10,7 @@ export interface UTXO {
 	redeemScript?: Uint8Array
 	witnessScript?: Uint8Array
 	isTaproot?: boolean
+	taprootWitness?: Uint8Array[]
 }
 
 export interface Target {
