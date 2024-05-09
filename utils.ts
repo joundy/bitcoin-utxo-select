@@ -48,16 +48,18 @@ export function outputBytes(output: Target) {
 	if (output.script) {
 		bytes += output.script.byteLength
 	} else if (
-		output.address?.startsWith('bc1') ||
-		output.address?.startsWith('tb1') ||
-		output.address?.startsWith('bcrt1')
+		output.address?.startsWith('bc1') || // mainnet
+		output.address?.startsWith('tb1') || // testnet
+		output.address?.startsWith('bcrt1') // regtest
 	) {
+		// 42 for mainnet/testnet, 44 for regtest
 		if (output.address?.length === 42 || output.address?.length === 44) {
 			bytes += TX_OUTPUT_SEGWIT
 		} else {
 			// taproot fee approximate is same like p2wsh (2 of 3 multisig)
 			bytes += TX_OUTPUT_SEGWIT_SCRIPTHASH
 		}
+		// both testnet and regtest has the same prefix 2
 	} else if (output.address?.startsWith('3') || output.address?.startsWith('2')) {
 		bytes += TX_OUTPUT_SCRIPTHASH
 	} else {
