@@ -1,10 +1,13 @@
 import { Target, UTXO } from './types'
 
+// Refer to this page: https://bitcoinops.org/en/tools/calc-size/
+
 export const TX_EMPTY_SIZE = 4 + 1 + 1 + 4
+
 export const TX_INPUT_BASE = 32 + 4 + 1 + 4
 export const TX_INPUT_PUBKEYHASH = 107
-export const TX_INPUT_SEGWIT = 27
-export const TX_INPUT_TAPROOT = 17 // round up 16.5 bytes
+export const TX_INPUT_SEGWIT = 27 + 1
+export const TX_INPUT_TAPROOT = 17 + 1
 
 export const TX_OUTPUT_BASE = 8 + 1
 export const TX_OUTPUT_PUBKEYHASH = 25
@@ -24,12 +27,10 @@ export function inputBytes(input: UTXO) {
 		bytes += Math.ceil(input.witnessScript.byteLength / 4)
 	} else if (input.isTaproot) {
 		if (input.taprootWitness) {
-			bytes +=
-				Math.ceil(
-					(TX_INPUT_TAPROOT * 4 +
-						input.taprootWitness.reduce((prev, buffer) => prev + buffer.byteLength, 0)) /
-						4,
-				) + 1
+			bytes += Math.ceil(
+				TX_INPUT_TAPROOT +
+					input.taprootWitness.reduce((prev, buffer) => prev + buffer.byteLength, 0) / 4,
+			)
 		} else {
 			bytes += TX_INPUT_TAPROOT
 		}
