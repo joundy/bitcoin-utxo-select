@@ -8,9 +8,10 @@ export function coinSelect(
 	outputs: Target[],
 	feeRate: number,
 	changeAddress?: string,
+	changeOutput = true,
 ) {
 	const orderedUtxos = sortUtxoBasedOnScore(utxos, feeRate)
-	return accumulative(preInputs, orderedUtxos, outputs, feeRate, changeAddress)
+	return accumulative(preInputs, orderedUtxos, outputs, feeRate, changeAddress, changeOutput)
 }
 
 export * from './algo'

@@ -107,10 +107,12 @@ export function finalize(
 	outputs: Target[],
 	feeRate: number,
 	changeAddress?: string,
+	changeOutput?: boolean,
 ): {
 	inputs?: UTXO[]
 	outputs?: Target[]
 	fee: number
+	txFee?: number
 } {
 	let changeFee = TX_OUTPUT_BASE + TX_OUTPUT_PUBKEYHASH
 	if (changeAddress) {
@@ -121,20 +123,25 @@ export function finalize(
 	const feeAfterExtraOutput = feeRate * (bytesAccum + changeFee)
 	const remainderAfterExtraOutput = sumValues(inputs) - (sumValues(outputs) + feeAfterExtraOutput)
 
-	// is it worth a change output?
-	if (remainderAfterExtraOutput > dustThreshold(feeRate)) {
-		outputs = outputs.concat({
-			address: changeAddress,
-			value: remainderAfterExtraOutput,
-		})
+	if (changeOutput) {
+		// is it worth a change output?
+		if (remainderAfterExtraOutput > dustThreshold(feeRate)) {
+			outputs = outputs.concat({
+				address: changeAddress,
+				value: remainderAfterExtraOutput,
+			})
+		}
 	}
 
 	var fee = sumValues(inputs) - sumValues(outputs)
 	if (!isFinite(fee)) return { fee: feeRate * bytesAccum }
 
+	const txFee = transactionBytes(inputs, outputs) * feeRate
+
 	return {
 		inputs,
 		outputs,
 		fee,
+		txFee,
 	}
 }

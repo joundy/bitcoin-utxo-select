@@ -7,6 +7,7 @@ export function accumulative(
 	outputs: Target[],
 	feeRate: number,
 	changeAddress?: string,
+	changeOutput?: boolean,
 ) {
 	let bytesAccum = transactionBytes(preInputs, outputs)
 	let inAccum = 0
@@ -20,7 +21,7 @@ export function accumulative(
 
 	const fee = feeRate * bytesAccum
 	if (inAccum > outAccum + fee) {
-		return finalize(inputs, outputs, feeRate, changeAddress)
+		return finalize(inputs, outputs, feeRate, changeAddress, changeOutput)
 	}
 
 	for (const utxo of utxos) {
@@ -40,7 +41,7 @@ export function accumulative(
 		// let's add others utxos as well
 		if (inAccum < outAccum + fee) continue
 
-		return finalize(inputs, outputs, feeRate, changeAddress)
+		return finalize(inputs, outputs, feeRate, changeAddress, changeOutput)
 	}
 
 	return {
